@@ -1,0 +1,43 @@
+.red{
+  color: #fff;
+}
+
+.id{
+  width: 10px;
+  text-align: center;
+}
+
+.checkbox_block{
+  text-align: center;
+}
+.checkbox{
+  height: 50px;
+  width: 50px;
+  text-align: center;
+  font-size: 24px;
+  font-weight: bold;
+}
+
+.label_name,
+.input_name{
+  display: block;
+}
+.label_name{
+  font-size: 20px;
+  font-weight: bolder;
+}
+.input_name{
+  margin: 10px 0px;
+  width: 200px;
+  height: 30px;
+  text-align: center;
+  font-size: 24px;
+}
+
+.alert{
+  display: block;
+  margin: 30px 0px;
+  font-weight: bold;
+  font-size: 24px;
+  color: red;
+}
