@@ -21,58 +21,46 @@ interface ITableList {
   body:string;
 }
 
-  export function App(){
+export function App() {
+  const [tables, setTables] = useState<ITable>({ test_data: [], result_table: [] });
+  const [tablesList, setTablesList] = useState<ITableList[]>([]);
+  const [isPage, setPage] = useState('*');
 
-    const [tables, setTables] = useState<ITable>({ test_data: [], result_table: [] });
-    const [tablesList, setTablesList] = useState<ITableList[]>([]);
-    const[isPage,setPage] = useState('*');
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        const [listResponse, itemResponse] = await Promise.all([
+          axios.get('http://localhost:3001/list'),
+          axios.get('http://localhost:3001/item')
+        ]);
 
-    // Инициализация состояния liStates внутри useEffect
-    useEffect(() => {
-      async function fetchDataList() {
-        try {
-          const response = await axios.get('http://localhost:3001/list');
-          if (response.status !== 200) {
-            throw new Error('Ошибка при получении данных');
-          }
-          const data: ITableList[] = response.data;
-
-          setTablesList(data);
-        } catch (error) {
-          console.error('Ошибка:', error);
+        if (listResponse.status !== 200 || itemResponse.status !== 200) {
+          throw new Error('Ошибка при получении данных');
         }
-      }
 
-      async function fetchDataItem() {
-        try {
-          const response = await axios.get('http://localhost:3001/item');
-          if (response.status !== 200) {
-            throw new Error('Ошибка при получении данных');
-          }
-          const data: ITable = response.data;
-          delete data.result_table
-          setTables(data);    
-          
-        } catch (error) {
-          console.error('Ошибка:', error);
-        }
+        const listData: ITableList[] = listResponse.data;
+        const itemData: ITable = itemResponse.data;
+        delete itemData.result_table;
+
+        setTablesList(listData);
+        setTables(itemData);
+      } catch (error) {
+        console.error('Ошибка:', error);
       }
-  
-      fetchDataList();
-      fetchDataItem();
-      
-    }, [isPage]);
-    
-    return (
-      <BrowserRouter>
+    }
+
+    fetchData();
+  }, [isPage]);
+
+  return (
+    <BrowserRouter>
       <Routes>
-        {/* подстановочный путь */}
-        <Route path="*" element={<TestList tables={tablesList} setPage={setPage}/>} />
-        <Route path={"/:isPage"} element={< TestItem tables={tables} {...tables} setPage={setPage} isPage={isPage} title={tablesList[Number(isPage)-1] ? tablesList[Number(isPage)-1].body : ''}/>} />
-        <Route path="/result" element={<Resultpage/>} />
+        <Route path="*" element={<TestList tables={tablesList} setPage={setPage} />} />
+        <Route path="/:isPage" element={<TestItem tables={tables} setPage={setPage} isPage={isPage} title={tablesList[Number(isPage)-1] ? tablesList[Number(isPage)-1].body : ''} />} />
+        <Route path="/result" element={<Resultpage />} />
       </Routes>
     </BrowserRouter>
-    );
-  }
+  );
+}
 
 export default App;

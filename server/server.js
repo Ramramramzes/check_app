@@ -1,19 +1,43 @@
-import express  from 'express';
+import express from 'express';
 import { createConnection } from 'mysql';
 
 const app = express();
 app.use(express.json());
 
-const connection = createConnection({
-  host: 'localhost',
-  user: 'root',
-  password: 'root',
-  database: 'forms_project'
-});
+function connectToDatabase() {
+  const connection = createConnection({
+    host: 'mysql.j26063212.myjino.ru',
+    user: 'j26063212_login',
+    password: 'Marat642330',
+    database: 'j26063212_check',
+  });
 
-connection.connect();
+  connection.connect((err) => {
+    if (err) {
+      console.error('Ошибка при подключении к базе данных:', err);
+      setTimeout(reconnect, 2000);
+    } else {
+      console.log('Успешное подключение к базе данных');
+    }
+  });
 
-const queryTables = 'SELECT table_name FROM information_schema.tables WHERE table_schema = "forms_project"';
+  connection.on('error', (err) => {
+    console.error('Ошибка соединения с базой данных:', err);
+    reconnect();
+  });
+
+  return connection;
+}
+
+function reconnect() {
+  console.log('Переподключение к базе данных...');
+  connection = connectToDatabase();
+}
+
+let connection = connectToDatabase();
+
+
+const queryTables = 'SELECT table_name FROM information_schema.tables WHERE table_schema = "j26063212_check"';
 
 app.use((req, res, next) => {
   res.header('Access-Control-Allow-Origin', '*');
@@ -37,28 +61,16 @@ app.get('/list', (req, res) => {
       console.error('Ошибка выполнения SQL запроса для таблицы test_titles');
       console.log(results);
     }
-
-
-    // const tables = results.map(row => row.table_name);
-    // const tableData = {};
-
-    // for (const table of tables) {
-    //   const queryTableData = `SELECT * FROM ${table}`;
-    //   try {
-    //     const tableResults = await query(queryTableData);
-    //     tableData[table] = tableResults;
-    //   } catch (error) {
-    //     console.error('Ошибка выполнения SQL запроса для таблицы', table, ':', error);
-    //     tableData[table] = { error: 'Ошибка при получении данных из таблицы' };
-    //   }
-    // }
-
-    // res.json(tableData);
   });
 });
 
 app.get('/item', (req, res) => {
   connection.query(queryTables, async (error, results) => {
+    if (error) {
+      console.error('Ошибка выполнения SQL запроса:', error);
+      res.status(500).json({ error: 'Ошибка при получении данных из базы данных' });
+      return;
+    }
 
     const tables = results.map(row => row.table_name);
     const tableData = {};
@@ -77,8 +89,6 @@ app.get('/item', (req, res) => {
     res.json(tableData);
   });
 });
-
-
 
 app.post('/api/result', async (req, res) => {
   const { test_name, student, student_res, date } = req.body;
