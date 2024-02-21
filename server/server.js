@@ -3,13 +3,14 @@ import { createConnection } from 'mysql';
 
 const app = express();
 app.use(express.json());
+app.use(express.static('dist'));
 
 function connectToDatabase() {
   const connection = createConnection({
-    host: 'mysql.j26063212.myjino.ru',
-    user: 'j26063212_login',
-    password: 'Marat642330',
-    database: 'j26063212_check',
+    host: 'localhost',
+    user: 'root',
+    password: 'root', 
+    database: 'forms_project',
   });
 
   connection.connect((err) => {
@@ -37,7 +38,7 @@ function reconnect() {
 let connection = connectToDatabase();
 
 
-const queryTables = 'SELECT table_name FROM information_schema.tables WHERE table_schema = "j26063212_check"';
+const queryTables = 'SELECT table_name FROM information_schema.tables WHERE table_schema = "forms-project"';
 
 app.use((req, res, next) => {
   res.header('Access-Control-Allow-Origin', '*');
@@ -53,7 +54,6 @@ app.get('/list', (req, res) => {
       return;
     }
     const queryTableData = `SELECT * FROM test_titles`;
-
     try {
       const tableResults = await query(queryTableData);
       res.json(tableResults)
@@ -64,8 +64,9 @@ app.get('/list', (req, res) => {
   });
 });
 
+const queryTablesItem = 'SELECT table_name FROM information_schema.tables WHERE table_name LIKE "test_data%"';
 app.get('/item', (req, res) => {
-  connection.query(queryTables, async (error, results) => {
+  connection.query(queryTablesItem, async (error, results) => {
     if (error) {
       console.error('Ошибка выполнения SQL запроса:', error);
       res.status(500).json({ error: 'Ошибка при получении данных из базы данных' });
