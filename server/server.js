@@ -1,18 +1,21 @@
-import express from 'express';
-import { createConnection } from 'mysql';
+import express from 'express'; 
+import { createConnection } from 'mysql'; 
 
-const app = express();
-app.use(express.json());
-app.use(express.static('dist'));
+const app = express(); // Создание экземпляра приложения Express
+app.use(express.json()); // Подключение middleware для работы с JSON
+// Подключение middleware для обслуживания статических файлов 
+app.use(express.static('dist')); //? меняем_тут / выбираем путь до билда index.html из папки запуска
 
+// Функция для соединения с базой данных MySQL
 function connectToDatabase() {
   const connection = createConnection({
-    host: 'localhost',
-    user: 'root',
-    password: 'root', 
-    database: 'forms_project',
+    host: 'localhost', //? меняем_тут
+    user: 'root', //? меняем_тут
+    password: 'root', //? меняем_тут
+    database: 'forms_project', //? меняем_тут
   });
 
+  // Обработчик события подключения к базе данных
   connection.connect((err) => {
     if (err) {
       console.error('Ошибка при подключении к базе данных:', err);
@@ -22,6 +25,7 @@ function connectToDatabase() {
     }
   });
 
+  // Обработчик события ошибки соединения с базой данных
   connection.on('error', (err) => {
     console.error('Ошибка соединения с базой данных:', err);
     reconnect();
@@ -30,22 +34,25 @@ function connectToDatabase() {
   return connection;
 }
 
+// Функция для переподключения к базе данных
 function reconnect() {
   console.log('Переподключение к базе данных...');
   connection = connectToDatabase();
 }
 
-let connection = connectToDatabase();
+let connection = connectToDatabase(); // Установка соединения с базой данных
 
+// Запрос списка таблиц
+const queryTables = 'SELECT table_name FROM information_schema.tables WHERE table_schema = "forms-project"';  //? меняем_тут / название своей бд
 
-const queryTables = 'SELECT table_name FROM information_schema.tables WHERE table_schema = "forms-project"';
-
+// Middleware для CORS
 app.use((req, res, next) => {
   res.header('Access-Control-Allow-Origin', '*');
   res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
   next();
 });
 
+// Обработчик GET запроса для получения списка
 app.get('/list', (req, res) => {
   connection.query(queryTables, async (error, results) => {
     if (error) {
@@ -64,7 +71,10 @@ app.get('/list', (req, res) => {
   });
 });
 
-const queryTablesItem = 'SELECT table_name FROM information_schema.tables WHERE table_name LIKE "test_data%"';
+// Запрос элементов таблицы
+const queryTablesItem = 'SELECT table_name FROM information_schema.tables WHERE table_name LIKE "test_data%"'; //? меняем_тут / название своих тестов у меня они идут test_data_1 , test_data_2 , test_data_3 ...
+
+// Обработчик GET запроса для получения элементов таблицы
 app.get('/item', (req, res) => {
   connection.query(queryTablesItem, async (error, results) => {
     if (error) {
@@ -91,6 +101,7 @@ app.get('/item', (req, res) => {
   });
 });
 
+// Обработчик POST запроса для сохранения результатов тестирования
 app.post('/api/result', async (req, res) => {
   const { test_name, student, student_res, date } = req.body;
 
@@ -104,6 +115,7 @@ app.post('/api/result', async (req, res) => {
   }
 });
 
+// Функция для выполнения SQL запросов к базе данных
 function query(sql) {
   return new Promise((resolve, reject) => {
     connection.query(sql, (error, results) => {
@@ -116,6 +128,8 @@ function query(sql) {
   });
 }
 
-app.listen(3001, () => {
-  console.log(`Сервер запущен на порту ${3001}`);
+// Порт, на котором запускается сервер 
+const PORT = 3001; //? меняем_тут
+app.listen(PORT, () => {
+  console.log(`Сервер запущен на порту ${PORT}`);
 });

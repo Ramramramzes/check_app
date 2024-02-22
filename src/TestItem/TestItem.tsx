@@ -20,48 +20,54 @@ interface IList{
   res: string;
 }
 
+// Компонент элемента теста
 export function TestItem({ tables, setPage, isPage, title}: { tables: ITable, setPage: (key: string) => void, isPage: string, title: string}) {
+  // Получение массива данных из таблицы для текущей страницы
   const listArray = tables[`test_data_${isPage}`];
+  // Инициализация состояния для элементов списка
   const initialLiStates: IList[] = listArray ? listArray.map((el) => ({ id: el.id, res: '' })) : [];
+  // Состояние для имени студента
   const [student,setStudent] = useState('');
+  // Состояние для элементов списка
   const [liStates, setLiStates] = useState<IList[]>([]);
+  // Состояние для проверки заполнения данных студента
   const [isLink, setLink] = useState(false)
-  // test_name, student, student_res, date 
+  // Название теста
   const test_name = title;
-//?---------------------------------------------
 
-// const initialLiStates: IList[] = listArray.map((el) => ({ id: el.id, res: false }));
+  // Эффект для инициализации списка при загрузке компонента
+  useEffect(()=>{
+    setLiStates(initialLiStates);
+  },[])
 
-useEffect(()=>{
-  setLiStates(initialLiStates);
-},[])
+  // Обработчик изменения значения в поле ввода
+  const changeValue = (id: number) => (event: React.ChangeEvent<HTMLInputElement>) => {
+    const { value } = event.target;
+    const newListStates = [...liStates];
+    newListStates[id] = { ...newListStates[id], res: value };
+    setLiStates(newListStates);
+  };
 
-const changeValue = (id: number) => (event: React.ChangeEvent<HTMLInputElement>) => {
-  const { value } = event.target;
-  const newListStates = [...liStates];
-  newListStates[id] = { ...newListStates[id], res: value };
-  setLiStates(newListStates);
-};
+  // Обработчик клика по кнопке + 
+  const handleClickUp = (id:number) => {
+    const newListStates = [...liStates];
+    newListStates[id] = newListStates[id].res != '' ? {id: id + 1, res: (Number(newListStates[id].res) + 1).toString()} :  {id: id + 1, res: '1'};
+    setLiStates(newListStates);
+  }
 
-const handleClickUp = (id:number) => {
-  const newListStates = [...liStates];
-  newListStates[id] = newListStates[id].res != '' ? {id: id + 1, res: (Number(newListStates[id].res) + 1).toString()} :  {id: id + 1, res: '1'};
-  setLiStates(newListStates);
-}
+  // Обработчик клика по кнопке -
+  const handleClickDoun = (id:number) => {
+    const newListStates = [...liStates];
+    newListStates[id] = newListStates[id].res != '' && newListStates[id].res != '0' ? {id: id + 1, res: (Number(newListStates[id].res) - 1).toString()} :  {id: id + 1, res: '0'};
+    setLiStates(newListStates);
+  }
 
-const handleClickDoun = (id:number) => {
-  const newListStates = [...liStates];
-  newListStates[id] = newListStates[id].res != '' && newListStates[id].res != '0' ? {id: id + 1, res: (Number(newListStates[id].res) - 1).toString()} :  {id: id + 1, res: '0'};
-  setLiStates(newListStates);
-}
+  // Обработчик события возврата на главную страницу
+  const handleLinkClick = () => {
+    setPage('*');
+  };
 
-
-const handleLinkClick = () => {
-  setPage('*');
-};
-
-//?---------------------------------------------
-
+  // Если таблицы пусты или не существуют, отображается сообщение об отсутствии данных и кнопка возврата на главную
   if (!listArray && isPage !== '*') {
     return (
       <div className={styles.red}>
@@ -71,6 +77,7 @@ const handleLinkClick = () => {
     );
   }
 
+  // Функция для получения текущей даты
   function getCurrentDate(): string {
     const date = new Date();
     const day = String(date.getDate()).padStart(2, '0'); // Добавляем нули спереди, если число состоит из одной цифры
@@ -78,13 +85,17 @@ const handleLinkClick = () => {
     const year = date.getFullYear();
     return `${day}.${month}.${year}`;
   }
+
+  // Обработчик события изменения данных студента
   const handleIntputChange = (event: React.ChangeEvent<HTMLInputElement>) =>{
     event.target.value.trim() !== '' ? setLink(true) : setLink(false)
     setStudent(event.target.value);
   }
+
+  // Функция для обработки отправки данных на сервер
   const handlePost = async () => {
     try {
-      await axios.post('http://localhost:3001/api/result', {
+      await axios.post('http://localhost:3001/api/result', { //? меняем_тут
         test_name: test_name,
         student: student,
         student_res: liStates,
@@ -98,17 +109,16 @@ const handleLinkClick = () => {
     setPage('*');
   }
 
-
-
-
   return (
     <div className={styles.red}>
       <h1>{title}</h1>
+      {/* Блок навигации и ввода данных студента */}
       <div className={styles.linkBack_block}>
         <Link className='buttons_link' onClick={handleLinkClick} to={'/'}>Назад</Link>
         <label className={styles.label_name} htmlFor="name">Данные студента:</label>
         <input name='name' className={styles.input_name} onChange={handleIntputChange} type="text" id="student" />
       </div>
+      {/* Таблица с данными теста */}
       <table border={2}>
         <tr>
           <th></th>
@@ -118,6 +128,7 @@ const handleLinkClick = () => {
           <th>Балл</th>
           <th>клик</th>
         </tr>
+        {/* Отображение данных теста */}
         {listArray && listArray.map((el: IRowData, index: number) => {
           return (
             <tr key={el.id}>
@@ -125,15 +136,17 @@ const handleLinkClick = () => {
               <td className={styles.body}>{el.body}</td>
               <td className={styles.move}>{el.move}</td>
               <td className={styles.what}>{el.what}</td>
-              <td className={styles.checkbox_block}>
+              {/* Поле для ввода оценки */}
+              <td className={styles.input_block}>
                 <input 
                   min={0}
                   value={liStates && liStates[index] ? liStates[index].res : ''}
-                  className={styles.checkbox}
+                  className={styles.input_num}
                   type="number"
                   onChange={changeValue(index)}
                 />
               </td>
+              {/* Кнопки для изменения оценки */}
               <td>
                 <button onClick={() => handleClickUp(index)}>+</button>
                 <button onClick={() => handleClickDoun(index)}>-</button>
@@ -142,6 +155,7 @@ const handleLinkClick = () => {
           );
         })}
       </table>
+      {/* Кнопка отправки данных */}
       {isLink ? (<Link className='buttons_link' onClick={handlePost} to={'/result'}>Отправить</Link>)
       :
       (<span className={styles.alert}>Введите данные студента для отправки</span>)}
