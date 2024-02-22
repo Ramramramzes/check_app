@@ -1,6 +1,6 @@
 # SPA приложение для проведения тестирований
 ---
-## Что <span style="color:#747bff">делает</span> проект?
+## Что делает проект?
 ---
 Это одностраничное приложение (SPA), цель которого состоит в тестировании. Оно предоставляет пользователю несколько страниц:
 
@@ -15,7 +15,7 @@
 Это приложение отлично продойдет для проведения тестирований и сбора  информации.
 
 ---
-## Как это <span style="color:#747bff">работает</span>?
+## Как это работает?
 ---
 - Запускаем наше приложение 
 ```bash
@@ -39,7 +39,7 @@
 <img src="./readme_img/spa4.png" width="700">
 
 ---
-## Как <span style="color:#747bff">выглядит</span> база данных (MySql)
+## Как выглядит база данных (MySql)
 ---
 
 - Бд выглядит следующим образом
@@ -66,20 +66,20 @@
 
 <img src="./readme_img/bd5.png" width="700">
 
-В нашем случае мы обрабатываем полученные данные в excel при помощи <span style="color:#747bff; font-weight: bold">MySQL Connector/NET</span>
+В нашем случае мы обрабатываем полученные данные в excel при помощи **`MySQL Connector/NET`**
 Документация [MySQL Connector/NET](https://dev.mysql.com/doc/connector-net/en/)
 Установка [MySQL Connector/NET](https://dev.mysql.com/downloads/connector/net/)
 
 ---
-## Как начать <span style="color:#747bff">использовать</span>?
+## Как начать использовать?
 ---
 - Для начала вам нужно создать БД, формат которой указан выше (ну или свой с последующей заменой переменных)
-- Далее меняем данные в файлах, места для замены я пометил фразой <span style="color:#747bff; font-weight: bold">меняем_тут</span>
+- Далее меняем данные в файлах, места для замены я пометил фразой **меняем_тут**
 - App.tsx и TestItem.tsx
   - вместо ```localhost:3001``` указываем  хост где находится ваше приложение
 - server.js 
-  - ```app.use(express.static('dist'))``` вместо <span style="color:#747bff; font-weight: bold">dist</span> указываем путь до папки dist от места запуска приложения
+  - ```app.use(express.static('dist'))``` вместо **`dist`** указываем путь до папки dist от места запуска приложения
   - `connection` в константе меняем все данные для подключения к своей БД
-  - `queryTables` вместо <span style="color:#747bff; font-weight: bold">forms-project</span> пишем название своей БД
-  - `queryTablesItem` вместо <span style="color:#747bff; font-weight: bold">test_data%</span> пишем начало названия своих тестов
-  - `PORT` вместо <span style="color:#747bff; font-weight: bold">3001</span> пишем доступный вам порт
+  - `queryTables` вместо `forms-project` пишем название своей БД
+  - `queryTablesItem` вместо `test_data%` пишем начало названия своих тестов
+  - `PORT` вместо 3001 пишем доступный вам порт
