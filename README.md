@@ -67,8 +67,8 @@
 <img src="./readme_img/bd5.png" width="700">
 
 В нашем случае мы обрабатываем полученные данные в excel при помощи **`MySQL Connector/NET`**
-Документация [MySQL Connector/NET](https://dev.mysql.com/doc/connector-net/en/)
-Установка [MySQL Connector/NET](https://dev.mysql.com/downloads/connector/net/)
+- Документация [MySQL Connector/NET](https://dev.mysql.com/doc/connector-net/en/)
+- Установка [MySQL Connector/NET](https://dev.mysql.com/downloads/connector/net/)
 
 ##  <a name="section4"></a> Как начать использовать?
 - Для начала вам нужно создать БД, формат которой указан выше (ну или свой с последующей заменой переменных)
